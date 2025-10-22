@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VORTECT 1.0.0</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 relative">
+
+  <!-- Musik -->
+  <audio autoplay loop hidden>
+    <source src="https://files.catbox.moe/4piy1e.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Partikel -->
+  <canvas id="particles" class="fixed inset-0 z-0"></canvas>
+
+  <!-- Hamburger -->
+  <div id="hamburger" title="Menu">
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
+
+  <!-- Sidebar -->
+  <div id="sidebar" aria-hidden="true">
+    <div class="flex justify-between items-center mb-4">
+      <h2 id="sidebarUser">Kontak</h2>
+      <button id="closeSidebar" class="text-cyan-500 text-xl font-bold hover:text-white transition" aria-label="Close sidebar">×</button>
+    </div>
+    
+    <a href="https://wa.me/6288214989352" target="_blank" rel="noopener">WhatsApp</a>
+    <a href="https://t.me/hamzisheregng" target="_blank" rel="noopener">Telegram</a>
+    <a href="https://instagram.com/hamzz_jr" target="_blank" rel="noopener">Instagram</a>
+    
+    <div class="mt-4 mb-4 border-t border-cyan-700 pt-4">
+      <h3 class="text-sm font-medium text-cyan-400 mb-3 text-center">Connect WhatsApp</h3>
+      
+      <button id="connectQrBtn" class="w-full py-3 mb-3 bg-gradient-to-r from-cyan-800 to-blue-900 text-white rounded-lg border border-cyan-600 hover:border-cyan-400 transition-all duration-300 flex items-center justify-center">
+        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+        </svg>
+        Connect with QR Code
+      </button>
+      
+      <button id="connectPairingBtn" class="w-full py-3 bg-gradient-to-r from-purple-800 to-blue-900 text-white rounded-lg border border-purple-600 hover:border-purple-400 transition-all duration-300 flex items-center justify-center">
+        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+        </svg>
+        Connect with Pairing Code
+      </button>
+    </div>
+
+    <button class="logout mt-4" id="logoutBtn">Logout</button>
+    
+    <div class="footer mt-6">
+      Powered By ilhamm
+    </div>
+  </div>
+
+  <!-- Pairing Modal -->
+  <div id="pairingModal">
+    <div class="modal-content">
+      <h3 class="text-xl font-bold text-cyan-400 mb-4 text-center">Pairing Code WhatsApp</h3>
+      
+      <p class="text-sm text-gray-300 mb-4 text-center">
+        Buka WhatsApp → Settings → Linked Devices → Link with Pairing Code
+      </p>
+
+      <!-- Input nomor WA -->
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-cyan-400 mb-2">Nomor WhatsApp</label>
+        <input 
+          id="waNumberInput" 
+          class="w-full px-4 py-2 bg-black/60 text-white rounded-lg border border-gray-700 focus:border-cyan-500 focus:outline-none"
+          placeholder="+628123456789, +13151234567, +447123456789"
+          type="tel"
+        />
+        <div id="countryInfo" class="country-info">
+          Masukkan nomor dengan kode negara. Contoh: +62 (Indonesia), +1 (US), +44 (UK), +93 (Afghanistan)
+        </div>
+      </div>
+
+      <!-- Tombol Generate Pairing Code -->
+      <button 
+        id="generatePairingBtn" 
+        class="w-full py-3 bg-gradient-to-r from-cyan-700 to-blue-800 text-white rounded-lg font-semibold hover:opacity-90 transition mb-4"
+      >
+        Generate Pairing Code
+      </button>
+
+      <!-- Status Pairing -->
+      <div id="pairingStatus" class="text-sm text-center mb-4 text-cyan-300">
+        Masukkan nomor WhatsApp dan klik Generate
+      </div>
+
+      <!-- Display Pairing Code -->
+      <div class="text-center mb-4">
+        <p class="text-sm text-cyan-300 mb-2">Kode Pairing:</p>
+        <div id="pairingCodeDisplay" class="text-3xl font-mono font-bold text-cyan-400 bg-black/50 py-3 rounded-lg tracking-widest">
+          • • • • • •
+        </div>
+      </div>
+
+      <!-- Tombol Tutup -->
+      <button 
+        id="closePairingModal" 
+        class="w-full py-2 bg-gray-800 text-cyan-300 rounded-lg hover:bg-gray-700 transition"
+      >
+        Tutup
+      </button>
+    </div>
+  </div>
+
+  <!-- QR Modal -->
+  <div id="qrModal">
+    <div class="modal-content">
+      <h3 class="text-xl font-bold text-cyan-400 mb-4 text-center">Scan QR Code WhatsApp</h3>
+      
+      <p class="text-sm text-gray-300 mb-4 text-center">
+        Buka WhatsApp → Settings → Linked Devices → Scan QR Code
+      </p>
+
+      <!-- QR Code Display -->
+      <div class="text-center mb-4">
+        <div id="qrCodeDisplay" class="bg-white p-4 rounded-lg inline-block">
+          <img id="qrImage" src="" alt="QR Code" class="mx-auto w-64 h-64">
+        </div>
+        <div id="qrStatus" class="text-sm text-cyan-300 mt-2">
+          Menghasilkan QR Code...
+        </div>
+      </div>
+
+      <!-- Tombol Tutup -->
+      <button 
+        id="closeQrModal" 
+        class="w-full py-2 bg-gray-800 text-cyan-300 rounded-lg hover:bg-gray-700 transition"
+      >
+        Tutup
+      </button>
+    </div>
+  </div>
+
+  <!-- LOGIN SCREEN -->
+  <div id="loginScreen" role="dialog" aria-modal="true">
+    <div class="login-card">
+      <div class="text-center mb-4">
+        <img src="https://files.catbox.moe/6ficae.jpg" class="mx-auto w-20 h-20 rounded-full border-2 border-cyan-600 shadow-lg mb-2" alt="avatar"/>
+        <h2 class="glitch" data-text="VORTEXT LOGIN">VORTECT LOGIN</h2>
+        <div class="small-txt">Masuk untuk mengakses Bug</div>
+      </div>
+
+      <div class="mt-4">
+        <label class="field-label" for="loginUsername">USERNAME</label>
+        <input id="loginUsername" class="input-field" placeholder="masukkan username" autocomplete="username" />
+      </div>
+      <div class="mt-3">
+        <label class="field-label" for="loginPassword">PASSWORD</label>
+        <input id="loginPassword" type="password" class="input-field" placeholder="masukkan password" autocomplete="current-password" />
+      </div>
+
+      <div class="login-actions">
+        <button id="loginBtn" class="w-full py-2 px-4 bg-gradient-to-r from-cyan-700 to-black text-white rounded-lg">LOGIN</button>
+        <button id="demoBtn" class="w-full py-2 px-4 border border-cyan-600 text-cyan-400 rounded-lg">Demo</button>
+      </div>
+
+      <div class="mt-3 small-txt">Masukkan: <b>User Anda</b> &nbsp;|&nbsp; Powered By: <b>ilhammm</b></div>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="mainApp" class="w-full max-w-2xl z-10" role="main" aria-hidden="true">
+    <div class="login-container rounded-2xl overflow-hidden">
+      <div class="py-6 px-6 text-center border-b border-cyan-600">
+        <img src="https://files.catbox.moe/6ficae.jpg" class="mx-auto w-20 h-20 rounded-full border-2 border-cyan-600 shadow-lg mb-4" alt="avatar"/>
+        <h1 id="appTitle" class="glitch" data-text="VORTEXT FLOWS">Vortect</h1>
+        <div class="bot-active mt-2"><div class="dot" aria-hidden="true"></div> BOT STATUS: ACTIVE</div>
+        
+        <div id="waStatus" class="text-xs mt-1 text-gray-500">
+          <span class="dot" style="background:#ff3366;box-shadow:0 0 10px #ff3366;"></span>
+          WhatsApp: <span id="waConnState">Disconnected</span>
+        </div>
+
+        <div id="gpsStatus" class="text-xs text-gray-400 mt-2 hidden">
+          <span class="dot" style="background:#00ffff;box-shadow:0 0 10px #00ffff;"></span>MENGIRIM KE TARGET...
+        </div>
+      </div>
+
+      <div class="p-6 space-y-6">
+        <div class="text-sm text-cyan-300">Login sebagai: <span id="loggedUser">-</span></div>
+
+        <div>
+          <label class="block text-sm font-medium text-cyan-400" for="whatsapp">NOMOR WHATSAPP TARGET</label>
+          <input type="tel" id="whatsapp" placeholder="Masukkan Nomor WhatsApp Target (+628123456789, +13151234567, dll)"
+            class="w-full px-4 py-3 bg-black/60 text-white rounded-lg border border-gray-700 focus:border-cyan-500 focus:outline-none transition"/>
+          <div id="targetCountryInfo" class="country-info">
+            Format: +kode negara + nomor. Contoh: +62, +1, +44, +93, dll.
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-cyan-400">PILIHAN BUG</label>
+          <div class="grid grid-cols-2 gap-3">
+            <button id="optionInvisible" class="option-btn py-3 bg-black/60 text-white rounded-lg border border-gray-700">Invisible Delay</button>
+            <button id="optionFcHard" class="option-btn py-3 bg-black/60 text-white rounded-lg border border-gray-700">FC HARD</button>
+            <button id="optionBulldozer" class="option-btn py-3 bg-black/60 text-white rounded-lg border border-gray-700">BULLDOZER</button>
+            <button id="optionFcClick" class="option-btn py-3 bg-black/60 text-white rounded-lg border border-gray-700">FC CLICK</button>
+          </div>
+        </div>
+
+        <div class="attack-box rounded-lg p-4 text-center">
+          <img src="https://files.catbox.moe/6ficae.jpg" alt="Attack Foto" class="mx-auto w-40 h-40 object-cover rounded-lg border-2 border-cyan-600 shadow-lg"/>
+        </div>
+
+        <button id="executeBtn"
+          class="w-full py-3 px-4 bg-gradient-to-r from-cyan-700 to-black hover:opacity-90 text-white font-semibold rounded-lg transition duration-300 flex items-center justify-center shadow-lg">
+          <span id="btnText">EXECUTE BUG</span>
+          <svg id="spinner" class="hidden w-5 h-5 ml-2 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none"
+            viewBox="0 0 24 24" aria-hidden="true">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Socket.IO Client -->
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+// Ganti dengan URL backend lu yang bener
+const BACKEND_URL = 'https://malas.hidup.lynz.biz.id:3000'; 
+const socket = io(BACKEND_URL, {
+  transports: ['websocket', 'polling'],
+  withCredentials: true
+});
+</script>
+  
+<script src="script.js" defer></script>
+</body>
+</html>
